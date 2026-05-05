@@ -1,15 +1,209 @@
-<h1>Welcome to my Django site</h1>
-<!DOCTYPE html>
-<html lang="uk">
+{% extends 'shop/base.html' %} {% block title %}Про нас{% endblock %} {% block content %}
+<div class="about-container">
+    <div class="about-hero">
+        <h1>Про наш магазин</h1>
+        <p>Дізнайтеся більше про нашу місію та цінності</p>
+    </div>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Про сайт</title>
-</head>
+    <div class="about-content">
+        <div class="about-section">
+            <div class="about-card">
+                <i class="fas fa-bullseye"></i>
+                <h2>Наша місія</h2>
+                <p>Ми створюємо платформу для обміну знаннями та досвідом, де кожен може знайти цікавий контент та поділитися своїми думками.</p>
+            </div>
 
-<body>
-    <h1>Сторінка про сайт</h1>
-    <p>Тут буде інформація про мій проєкт.</p>
-</body>
+            <div class="about-card">
+                <i class="fas fa-eye"></i>
+                <h2>Наша мета</h2>
+                <p>Стати найбільшою спільнотою авторів та читачів в Україні, де якісний контент є головною цінністю.</p>
+            </div>
 
-</html>
+            <div class="about-card">
+                <i class="fas fa-heart"></i>
+                <h2>Наші цінності</h2>
+                <p>Чесність, якість, відкритість та повага до кожного користувача - основні принципи нашої роботи.</p>
+            </div>
+        </div>
+
+        <div class="about-stats">
+            <div class="stat-item">
+                <i class="fas fa-newspaper"></i>
+                <h3>1000+</h3>
+                <p>Статей опубліковано</p>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-users"></i>
+                <h3>5000+</h3>
+                <p>Щасливих читачів</p>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-user-edit"></i>
+                <h3>200+</h3>
+                <p>Активних авторів</p>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-star"></i>
+                <h3>4.8</h3>
+                <p>Середня оцінка</p>
+            </div>
+        </div>
+
+        <div class="about-team">
+            <h2>Наша команда</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <i class="fas fa-user-circle"></i>
+                    <h3>Олександр Петренко</h3>
+                    <p>Засновник та CEO</p>
+                </div>
+                <div class="team-member">
+                    <i class="fas fa-user-circle"></i>
+                    <h3>Марія Іваненко</h3>
+                    <p>Головний редактор</p>
+                </div>
+                <div class="team-member">
+                    <i class="fas fa-user-circle"></i>
+                    <h3>Дмитро Коваленко</h3>
+                    <p>Технічний директор</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .about-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .about-hero {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        border-radius: 30px;
+        margin-bottom: 3rem;
+    }
+    
+    .about-hero h1 {
+        font-size: 3rem;
+        color: white;
+        margin-bottom: 1rem;
+    }
+    
+    .about-hero p {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .about-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+    
+    .about-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        text-align: center;
+        transition: transform 0.3s;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .about-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .about-card i {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+    
+    .about-card h2 {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    
+    .about-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+    
+    .stat-item {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        text-align: center;
+        transition: all 0.3s;
+    }
+    
+    .stat-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .stat-item i {
+        font-size: 2.5rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-item h3 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .about-team {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .about-team h2 {
+        color: white;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+    
+    .team-member {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        transition: all 0.3s;
+    }
+    
+    .team-member:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .team-member i {
+        font-size: 4rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+    
+    .team-member h3 {
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .about-hero h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}

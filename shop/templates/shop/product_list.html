@@ -1,0 +1,318 @@
+{% extends 'shop/base.html' %} {% block title %}Всі товари{% endblock %} {% block content %}
+<div class="shop-container">
+    <!-- Бокова панель з категоріями -->
+    <aside class="shop-sidebar">
+        <h3><i class="fas fa-tags"></i> Категорії</h3>
+        <ul class="category-list">
+            <li>
+                <a href="{% url 'shop:product_list' %}" class="{% if not category %}active{% endif %}">
+                    <i class="fas fa-box"></i> Всі товари
+                </a>
+            </li>
+            {% for cat in categories %}
+            <li>
+                <a href="{{ cat.get_absolute_url }}" class="{% if category.id == cat.id %}active{% endif %}">
+                    <i class="fas fa-folder"></i> {{ cat.name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </aside>
+
+    <!-- Сітка товарів -->
+    <div class="shop-products">
+        <div class="products-header">
+            <h1>{% if category %}{{ category.name }}{% else %}Всі товари{% endif %}</h1>
+            <p>Знайдено: {{ products|length }} товарів</p>
+        </div>
+
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card">
+                {% if product.old_price %}
+                <span class="product-badge">-{{ product.get_discount }}%</span> {% endif %} {% if product.is_hit %}
+                <span class="product-hit"><i class="fas fa-fire"></i> Хіт</span> {% endif %}
+
+                <div class="product-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+
+                <div class="product-info">
+                    <h3><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
+                    <p class="product-category">
+                        <i class="fas fa-tag"></i> {{ product.category.name }}
+                    </p>
+                    <p class="product-description">{{ product.description|truncatewords:15 }}</p>
+
+                    <div class="product-price">
+                        {% if product.old_price %}
+                        <span class="old-price">{{ product.old_price }} ₴</span>
+                        <span class="current-price">{{ product.price }} ₴</span> {% else %}
+                        <span class="current-price">{{ product.price }} ₴</span> {% endif %}
+                    </div>
+
+                    <div class="product-stock">
+                        {% if product.in_stock %}
+                        <span class="in-stock"><i class="fas fa-check-circle"></i> В наявності</span> {% else %}
+                        <span class="out-stock"><i class="fas fa-times-circle"></i> Немає в наявності</span> {% endif %}
+                    </div>
+
+                    <form action="{% url 'shop:cart_add' product.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-cart" {% if not product.in_stock %}disabled{% endif %}>
+                            <i class="fas fa-shopping-cart"></i> Купити
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-products">
+                <i class="fas fa-box-open"></i>
+                <h3>Товарів не знайдено</h3>
+                <p>Спробуйте обрати іншу категорію</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .shop-container {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    /* Sidebar */
+    
+    .shop-sidebar {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        height: fit-content;
+        position: sticky;
+        top: 80px;
+    }
+    
+    .shop-sidebar h3 {
+        margin-bottom: 1rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .category-list {
+        list-style: none;
+    }
+    
+    .category-list li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .category-list a {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        color: #666;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .category-list a:hover,
+    .category-list a.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    /* Products Grid */
+    
+    .products-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .products-header h1 {
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .products-header p {
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2rem;
+    }
+    
+    .product-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .product-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        z-index: 1;
+    }
+    
+    .product-hit {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        z-index: 1;
+    }
+    
+    .product-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .product-icon i {
+        font-size: 4rem;
+        color: white;
+    }
+    
+    .product-info {
+        padding: 1.5rem;
+    }
+    
+    .product-info h3 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-info h3 a {
+        color: #333;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .product-info h3 a:hover {
+        color: #667eea;
+    }
+    
+    .product-category {
+        font-size: 0.8rem;
+        color: #999;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-description {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
+    
+    .product-price {
+        margin-bottom: 1rem;
+    }
+    
+    .old-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.9rem;
+        margin-right: 0.5rem;
+    }
+    
+    .current-price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+    
+    .product-stock {
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .in-stock {
+        color: #4caf50;
+    }
+    
+    .out-stock {
+        color: #f44336;
+    }
+    
+    .btn-cart {
+        width: 100%;
+        padding: 0.75rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-cart:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-cart:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+    
+    .empty-products {
+        text-align: center;
+        padding: 4rem;
+        background: white;
+        border-radius: 15px;
+    }
+    
+    .empty-products i {
+        font-size: 4rem;
+        color: #ccc;
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .shop-container {
+            grid-template-columns: 1fr;
+        }
+        .shop-sidebar {
+            position: static;
+        }
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'shop/base.html' %} {% block title %}Кошик{% endblock %} {% block content %}
+<div class="cart-container">
+    <h1>Кошик</h1>
+
+    {% if cart %}
+    <div class="cart-items">
+        {% for item in cart %}
+        <div class="cart-item">
+            <div class="item-icon">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="item-details">
+                <h3>{{ item.product.name }}</h3>
+                <p>{{ item.product.price }} ₴ x {{ item.quantity }}</p>
+            </div>
+            <div class="item-total">
+                <span>{{ item.total_price }} ₴</span>
+                <a href="{% url 'shop:cart_remove' item.product.id %}" class="btn-remove">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="cart-total">
+        <h3>Загалом: {{ cart.get_total_price }} ₴</h3>
+        <a href="#" class="btn-checkout">Оформити замовлення</a>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <i class="fas fa-shopping-cart"></i>
+        <h3>Кошик порожній</h3>
+        <a href="{% url 'shop:product_list' %}" class="btn-shop">Перейти до товарів</a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .cart-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .cart-items {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .item-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+    
+    .item-icon i {
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .item-details {
+        flex: 1;
+    }
+    
+    .item-total {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .btn-remove {
+        color: #f44336;
+    }
+    
+    .cart-total {
+        background: white;
+        padding: 1rem;
+        border-radius: 15px;
+        margin-top: 1rem;
+        text-align: right;
+    }
+    
+    .btn-checkout {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+    }
+    
+    .empty-cart {
+        background: white;
+        padding: 3rem;
+        text-align: center;
+        border-radius: 15px;
+    }
+    
+    .empty-cart i {
+        font-size: 4rem;
+        color: #ccc;
+    }
+    
+    .btn-shop {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}

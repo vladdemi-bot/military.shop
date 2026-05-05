@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Мій Магазин{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="{% url 'shop:product_list' %}">
+                    <i class="fas fa-store"></i>
+                    <span>Мій Магазин</span>
+                </a>
+            </div>
+
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <ul class="nav-links" id="navLinks">
+                <li>
+                    <a href="{% url 'shop:product_list' %}">
+                        <i class="fas fa-home"></i> Головна
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'shop:product_list' %}">
+                        <i class="fas fa-box"></i> Всі товари
+                    </a>
+                </li>
+
+                {% if request.user.is_authenticated %}
+                <li>
+                    <a href="{% url 'profile' %}">
+                        <i class="fas fa-user"></i> Мій профіль
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'shop:cart_detail' %}">
+                        <i class="fas fa-shopping-cart"></i> Кошик
+                        <span class="cart-count" id="cartCount">0</span>
+                    </a>
+                </li>
+                <li>
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-logout">
+                                <i class="fas fa-sign-out-alt"></i> Вихід
+                            </button>
+                    </form>
+                </li>
+                {% else %}
+                <li>
+                    <a href="{% url 'shop:cart_detail' %}">
+                        <i class="fas fa-shopping-cart"></i> Кошик
+                        <span class="cart-count" id="cartCount">0</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'register' %}">
+                        <i class="fas fa-user-plus"></i> Реєстрація
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'login' %}">
+                        <i class="fas fa-sign-in-alt"></i> Вхід
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i> {{ message }}
+            <span class="close-btn">&times;</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %} {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3><i class="fas fa-store"></i> Мій Магазин</h3>
+                <p>Ваш надійний партнер у світі якісних товарів</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Навігація</h4>
+                <ul>
+                    <li><a href="{% url 'shop:product_list' %}">Головна</a></li>
+                    <li><a href="{% url 'shop:product_list' %}">Всі товари</a></li>
+                    <li><a href="{% url 'shop:cart_detail' %}">Кошик</a></li>
+                    {% if not request.user.is_authenticated %}
+                    <li><a href="{% url 'register' %}">Реєстрація</a></li>
+                    <li><a href="{% url 'login' %}">Вхід</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Контакти</h4>
+                <p><i class="fas fa-envelope"></i> info@myshop.com</p>
+                <p><i class="fas fa-phone"></i> +380 (99) 123-45-67</p>
+                <p><i class="fas fa-map-marker-alt"></i> м. Київ, Україна</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Мій Магазин. Всі права захищено.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        if (navToggle) {
+            navToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+        }
+
+        // Close messages
+        const closeButtons = document.querySelectorAll('.close-btn');
+        closeButtons.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                btn.parentElement.style.opacity = '0';
+                setTimeout(function() {
+                    btn.parentElement.remove();
+                }, 300);
+            });
+        });
+
+        // Auto close messages after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 300);
+            });
+        }, 5000);
+    </script>
+</body>
+
+</html>

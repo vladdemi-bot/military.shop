@@ -1,0 +1,117 @@
+{% extends 'shop/base.html' %} {% block title %}{{ product.name }}{% endblock %} {% block content %}
+<div class="product-detail">
+    <div class="product-card-detail">
+        <div class="product-icon-large">
+            <i class="fas fa-box-open"></i>
+        </div>
+        <div class="product-info-detail">
+            <h1>{{ product.name }}</h1>
+            <p class="category">{{ product.category.name }}</p>
+            <p class="description">{{ product.description|linebreaks }}</p>
+            <div class="price">
+                {% if product.old_price %}
+                <span class="old">{{ product.old_price }} ₴</span>
+                <span class="current">{{ product.price }} ₴</span> {% else %}
+                <span class="current">{{ product.price }} ₴</span> {% endif %}
+            </div>
+            <form action="{% url 'shop:cart_add' product.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn-buy">Додати до кошика</button>
+            </form>
+            <a href="{% url 'shop:product_list' %}" class="btn-back">← Назад до товарів</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-detail {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .product-card-detail {
+        background: white;
+        border-radius: 20px;
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        overflow: hidden;
+    }
+    
+    .product-icon-large {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .product-icon-large i {
+        font-size: 8rem;
+        color: white;
+    }
+    
+    .product-info-detail {
+        padding: 2rem;
+    }
+    
+    .product-info-detail h1 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .category {
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+    
+    .description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+    
+    .price {
+        margin-bottom: 1.5rem;
+    }
+    
+    .old {
+        text-decoration: line-through;
+        color: #999;
+        margin-right: 1rem;
+    }
+    
+    .current {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+    
+    .btn-buy,
+    .btn-back {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        margin-right: 1rem;
+    }
+    
+    .btn-buy {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    
+    .btn-back {
+        background: #6c757d;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .product-card-detail {
+            grid-template-columns: 1fr;
+        }
+        .product-icon-large {
+            padding: 3rem;
+        }
+    }
+</style>
+{% endblock %}
