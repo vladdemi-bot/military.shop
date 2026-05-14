@@ -4,11 +4,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Мій Магазин{% endblock %}</title>
+    <title>{% block title %}Мілітарка{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Глобальні стилі */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1a1a1a;
+            color: #d4d4d4;
+        }
+        /* Navbar */
+        
+        .navbar {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            border-bottom: 3px solid #4a5f2e;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo a {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #8B9A46;
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+        
+        .logo a:hover {
+            color: #6B7A30;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: #d4d4d4;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-links a:hover {
+            color: #8B9A46;
+        }
+        
+        .btn-logout {
+            background: #2a2a2a;
+            border: 1px solid #4a5f2e;
+            color: #d4d4d4;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .btn-logout:hover {
+            background: #4a5f2e;
+            color: white;
+        }
+        
+        .cart-count {
+            background: #4a5f2e;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            margin-left: 5px;
+        }
+        /* Основний контейнер з двома колонками */
+        
+        .main-layout {
+            display: flex;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 30px;
+            gap: 40px;
+        }
+        /* ЛІВИЙ САЙДБАР - АКУРАТНИЙ, ПРИТИСНУТИЙ ДО КРАЮ */
+        
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: #1a1a1a;
+            border-radius: 12px;
+            border: 1px solid #2a2a2a;
+            overflow: hidden;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .sidebar-header {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            padding: 18px 20px;
+            border-bottom: 2px solid #4a5f2e;
+        }
+        
+        .sidebar-header h3 {
+            color: #8B9A46;
+            font-size: 16px;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar-header h3 i {
+            margin-right: 10px;
+        }
+        /* Список категорій - без зайвих відступів */
+        
+        .category-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .category-list li {
+            border-bottom: 1px solid #252525;
+        }
+        
+        .category-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .category-list a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #d4d4d4;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 14px;
+            font-weight: 500;
+            gap: 12px;
+        }
+        
+        .category-list a i {
+            width: 22px;
+            color: #6B7A30;
+            font-size: 14px;
+        }
+        
+        .category-list a:hover {
+            background: #252525;
+            color: #8B9A46;
+            padding-left: 25px;
+        }
+        
+        .category-list a:hover i {
+            color: #8B9A46;
+        }
+        /* Розділ Інформація */
+        
+        .sidebar-section {
+            border-top: 1px solid #2a2a2a;
+            margin-top: 8px;
+        }
+        
+        .sidebar-section h4 {
+            padding: 14px 20px 8px 20px;
+            color: #6B7A30;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            margin: 0;
+        }
+        /* Правий контент */
+        
+        .content-area {
+            flex-grow: 1;
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #2a2a2a;
+        }
+        /* Товари сіткою */
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .product-card {
+            background: #222;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: #4a5f2e;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .product-info {
+            padding: 1.5rem;
+        }
+        
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+        }
+        
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #8B9A46;
+            margin: 8px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #2a2a2a;
+            color: #d4d4d4;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: 0.3s;
+            border: 1px solid #4a5f2e;
+            font-size: 13px;
+        }
+        
+        .btn:hover {
+            background: #4a5f2e;
+            color: white;
+        }
+        /* Футер */
+        
+        .footer {
+            background: #0a0a0a;
+            color: #888;
+            padding: 3rem 2rem 1.5rem;
+            margin-top: 4rem;
+            border-top: 2px solid #4a5f2e;
+        }
+        
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-section h3,
+        .footer-section h4 {
+            color: #8B9A46;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        
+        .footer-section a {
+            color: #888;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        
+        .footer-section a:hover {
+            color: #8B9A46;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-links a {
+            font-size: 1.2rem;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid #2a2a2a;
+            font-size: 0.8rem;
+        }
+        /* Адаптивність */
+        
+        .nav-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-toggle {
+                display: block;
+            }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: #1a1a1a;
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+                border-bottom: 1px solid #4a5f2e;
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .main-layout {
+                flex-direction: column;
+                padding: 0 20px;
+            }
+            .sidebar {
+                width: 100%;
+                position: static;
+            }
+            .content-area {
+                padding: 20px;
+            }
+        }
+        /* Повідомлення */
+        
+        .messages-container {
+            max-width: 1400px;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+        
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .alert-success {
+            background: #2e4a2e;
+            color: #a5d6a5;
+        }
+        
+        .alert-error {
+            background: #4a2e2e;
+            color: #d6a5a5;
+        }
+        
+        .close-btn {
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+    </style>
 </head>
 
 <body>
@@ -18,7 +395,7 @@
             <div class="logo">
                 <a href="{% url 'shop:product_list' %}">
                     <i class="fas fa-store"></i>
-                    <span>Мій Магазин</span>
+                    <span>Мілітарка</span>
                 </a>
             </div>
 
@@ -27,82 +404,76 @@
             </div>
 
             <ul class="nav-links" id="navLinks">
-                <li>
-                    <a href="{% url 'shop:product_list' %}">
-                        <i class="fas fa-home"></i> Головна
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'shop:product_list' %}">
-                        <i class="fas fa-box"></i> Всі товари
-                    </a>
-                </li>
+                <li><a href="{% url 'shop:product_list' %}"><i class="fas fa-home"></i> Головна</a></li>
+                <li><a href="{% url 'shop:product_list' %}"><i class="fas fa-box"></i> Всі товари</a></li>
 
                 {% if request.user.is_authenticated %}
+                <li><a href="{% url 'shop:profile' %}"><i class="fas fa-user"></i> Профіль</a></li>
+                <li><a href="{% url 'shop:cart_detail' %}"><i class="fas fa-shopping-cart"></i> Кошик <span class="cart-count" id="cartCount">0</span></a></li>
                 <li>
-                    <a href="{% url 'profile' %}">
-                        <i class="fas fa-user"></i> Мій профіль
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'shop:cart_detail' %}">
-                        <i class="fas fa-shopping-cart"></i> Кошик
-                        <span class="cart-count" id="cartCount">0</span>
-                    </a>
-                </li>
-                <li>
-                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    <form action="{% url 'shop:logout' %}" method="post" style="display:inline;">
                         {% csrf_token %}
-                        <button type="submit" class="btn-logout">
-                                <i class="fas fa-sign-out-alt"></i> Вихід
-                            </button>
+                        <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Вихід</button>
                     </form>
                 </li>
                 {% else %}
-                <li>
-                    <a href="{% url 'shop:cart_detail' %}">
-                        <i class="fas fa-shopping-cart"></i> Кошик
-                        <span class="cart-count" id="cartCount">0</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'register' %}">
-                        <i class="fas fa-user-plus"></i> Реєстрація
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'login' %}">
-                        <i class="fas fa-sign-in-alt"></i> Вхід
-                    </a>
-                </li>
+                <li><a href="{% url 'shop:cart_detail' %}"><i class="fas fa-shopping-cart"></i> Кошик <span class="cart-count" id="cartCount">0</span></a></li>
+                <li><a href="{% url 'shop:register' %}"><i class="fas fa-user-plus"></i> Реєстрація</a></li>
+                <li><a href="{% url 'shop:login' %}"><i class="fas fa-sign-in-alt"></i> Вхід</a></li>
                 {% endif %}
             </ul>
         </div>
     </nav>
 
-    <!-- Flash Messages -->
+    <!-- Повідомлення -->
     {% if messages %}
     <div class="messages-container">
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">
-            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i> {{ message }}
+            <span><i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i> {{ message }}</span>
             <span class="close-btn">&times;</span>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <!-- Main Content -->
-    <main class="main-content">
-        {% block content %} {% endblock %}
-    </main>
+    <!-- Основний контент -->
+    <div class="main-layout">
+        <!-- Лівий сайдбар -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-folder-open"></i> КАТЕГОРІЇ</h3>
+            </div>
+            <ul class="category-list">
+                <li><a href="{% url 'shop:product_list' %}"><i class="fas fa-tags"></i> Всі товари</a></li>
+                <li><a href="{% url 'shop:product_list' %}?category=footwear"><i class="fas fa-shoe-prints"></i> Взуття</a></li>
+                <li><a href="{% url 'shop:product_list' %}?category=clothing"><i class="fas fa-tshirt"></i> Одяг</a></li>
+                <li><a href="{% url 'shop:product_list' %}?category=gear"><i class="fas fa-backpack"></i> Спорядження</a></li>
+                <li><a href="{% url 'shop:product_list' %}?category=tactical"><i class="fas fa-vest"></i> Тактичне</a></li>
+            </ul>
+            <!-- ВИДАЛІТЬ ЦЕ -->
+            <div class="sidebar-section">
+                <h4><i class="fas fa-info-circle"></i> ІНФОРМАЦІЯ</h4>
+                <ul class="category-list">
+                    <li><a href="#"><i class="fas fa-truck"></i> Доставка</a></li>
+                    <li><a href="#"><i class="fas fa-shield-alt"></i> Гарантія</a></li>
+                    <li><a href="#"><i class="fas fa-credit-card"></i> Оплата</a></li>
+                </ul>
+            </div>
+        </div>
 
-    <!-- Footer -->
+        <!-- Правий контент -->
+        <div class="content-area">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Футер -->
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-section">
-                <h3><i class="fas fa-store"></i> Мій Магазин</h3>
-                <p>Ваш надійний партнер у світі якісних товарів</p>
+                <h3><i class="fas fa-store"></i> Мілітарка</h3>
+                <p>Ваш надійний партнер у світі військового спорядження</p>
                 <div class="social-links">
                     <a href="#"><i class="fab fa-facebook"></i></a>
                     <a href="#"><i class="fab fa-instagram"></i></a>
@@ -111,61 +482,48 @@
                 </div>
             </div>
             <div class="footer-section">
-                <h4>Навігація</h4>
-                <ul>
-                    <li><a href="{% url 'shop:product_list' %}">Головна</a></li>
-                    <li><a href="{% url 'shop:product_list' %}">Всі товари</a></li>
-                    <li><a href="{% url 'shop:cart_detail' %}">Кошик</a></li>
-                    {% if not request.user.is_authenticated %}
-                    <li><a href="{% url 'register' %}">Реєстрація</a></li>
-                    <li><a href="{% url 'login' %}">Вхід</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-            <div class="footer-section">
                 <h4>Контакти</h4>
                 <p><i class="fas fa-envelope"></i> info@myshop.com</p>
                 <p><i class="fas fa-phone"></i> +380 (99) 123-45-67</p>
-                <p><i class="fas fa-map-marker-alt"></i> м. Київ, Україна</p>
+                <p><i class="fas fa-map-marker-alt"></i> м. Кропивницький, Україна</p>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 Мій Магазин. Всі права захищено.</p>
+            <p>&copy; 2026 Мілітарка. Всі права захищено.</p>
         </div>
     </footer>
 
     <script>
-        // Mobile menu toggle
         const navToggle = document.getElementById('navToggle');
         const navLinks = document.getElementById('navLinks');
-
         if (navToggle) {
             navToggle.addEventListener('click', function() {
                 navLinks.classList.toggle('active');
             });
         }
 
-        // Close messages
-        const closeButtons = document.querySelectorAll('.close-btn');
-        closeButtons.forEach(function(btn) {
+        document.querySelectorAll('.close-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                btn.parentElement.style.opacity = '0';
-                setTimeout(function() {
-                    btn.parentElement.remove();
-                }, 300);
+                this.parentElement.style.opacity = '0';
+                setTimeout(() => this.parentElement.remove(), 300);
             });
         });
 
-        // Auto close messages after 5 seconds
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                alert.style.opacity = '0';
-                setTimeout(function() {
-                    alert.remove();
-                }, 300);
-            });
-        }, 5000);
+        function updateCartCount() {
+            fetch('/cart/count/')
+                .then(response => response.json())
+                .then(data => {
+                    const cartCount = document.getElementById('cartCount');
+                    if (cartCount && data.count > 0) {
+                        cartCount.textContent = data.count;
+                        cartCount.style.display = 'inline-block';
+                    } else if (cartCount) {
+                        cartCount.style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        document.addEventListener('DOMContentLoaded', updateCartCount);
     </script>
 </body>
 

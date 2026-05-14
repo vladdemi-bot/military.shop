@@ -1,106 +1,120 @@
-{% extends 'shop/base.html' %} {% block title %}Вхід{% endblock %} {% block content %}
-<div class="form-container">
-    <div class="form-header">
-        <i class="fas fa-sign-in-alt"></i>
-        <h2>Вхід в акаунт</h2>
-        <p>Введіть свої дані для входу</p>
-    </div>
+{% extends 'shop/base.html' %} {% load static %} {% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2><i class="fas fa-sign-in-alt"></i> Вхід</h2>
 
-    <form method="post" class="auth-form">
-        {% csrf_token %}
+        <form method="post" class="auth-form">
+            {% csrf_token %}
 
-        <div class="form-group">
-            <label><i class="fas fa-user"></i> Ім'я користувача</label>
-            <input type="text" name="username" required placeholder="Введіть ваше ім'я">
-        </div>
+            <div class="form-group">
+                <label for="username"><i class="fas fa-user"></i> Ім'я користувача</label>
+                <input type="text" name="username" id="username" required placeholder="Введіть ім'я">
+            </div>
 
-        <div class="form-group">
-            <label><i class="fas fa-lock"></i> Пароль</label>
-            <input type="password" name="password" required placeholder="Введіть пароль">
-        </div>
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Пароль</label>
+                <input type="password" name="password" id="password" required placeholder="Введіть пароль">
+            </div>
 
-        <div class="form-options">
-            <label class="checkbox">
-                <input type="checkbox"> Запам'ятати мене
-            </label>
-            <a href="#" class="forgot-password">Забули пароль?</a>
-        </div>
+            <button type="submit" class="btn-auth">
+                <i class="fas fa-sign-in-alt"></i> Увійти
+            </button>
+        </form>
 
-        <button type="submit" class="btn-submit">
-            <i class="fas fa-sign-in-alt"></i> Увійти
-        </button>
-    </form>
-
-    <div class="form-footer">
-        <p>Немає акаунту? <a href="{% url 'register' %}">Зареєструватися</a></p>
+        <p class="auth-link">
+            Немає акаунта? <a href="{% url 'shop:register' %}">Зареєструватися</a>
+        </p>
     </div>
 </div>
 
 <style>
-    .form-header {
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+        padding: 2rem;
+    }
+    
+    .auth-card {
+        background: #222;
+        border: 1px solid #3a3a3a;
+        border-radius: 12px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 450px;
+    }
+    
+    .auth-card h2 {
+        color: #8B9A46;
         text-align: center;
         margin-bottom: 2rem;
+        font-size: 1.8rem;
     }
     
-    .form-header i {
-        font-size: 3rem;
-        color: #667eea;
-        margin-bottom: 1rem;
-    }
-    
-    .form-header h2 {
-        color: #333;
-        margin-bottom: 0.5rem;
-    }
-    
-    .form-header p {
-        color: #666;
-    }
-    
-    .auth-form {
-        max-width: 400px;
-        margin: 0 auto;
-    }
-    
-    .form-options {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .form-group {
         margin-bottom: 1.5rem;
-        font-size: 0.9rem;
     }
     
-    .checkbox {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        cursor: pointer;
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #d4d4d4;
+        font-weight: 500;
     }
     
-    .forgot-password {
-        color: #667eea;
-        text-decoration: none;
-        transition: color 0.3s;
+    .form-group label i {
+        margin-right: 8px;
+        color: #8B9A46;
     }
     
-    .forgot-password:hover {
-        color: #764ba2;
+    .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        background: #1a1a1a;
+        border: 1px solid #3a3a3a;
+        border-radius: 6px;
+        color: #d4d4d4;
+        font-size: 1rem;
+        transition: all 0.3s;
     }
     
-    .form-footer {
-        text-align: center;
-        margin-top: 2rem;
-        padding-top: 1rem;
-        border-top: 1px solid #e0e0e0;
+    .form-group input:focus {
+        outline: none;
+        border-color: #8B9A46;
+        box-shadow: 0 0 8px rgba(139, 154, 70, 0.3);
     }
     
-    .form-footer a {
-        color: #667eea;
-        text-decoration: none;
+    .btn-auth {
+        width: 100%;
+        padding: 12px;
+        background: #4a5f2e;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
         font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
     }
     
-    .form-footer a:hover {
+    .btn-auth:hover {
+        background: #3a4f1e;
+        transform: translateY(-2px);
+    }
+    
+    .auth-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #888;
+    }
+    
+    .auth-link a {
+        color: #8B9A46;
+        text-decoration: none;
+    }
+    
+    .auth-link a:hover {
         text-decoration: underline;
     }
 </style>

@@ -1,8 +1,10 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views_shop
 from . import views_auth
 
-app_name = 'shop'  # ← Це важливо!
+app_name = 'shop'
 
 urlpatterns = [
     path('', views_shop.product_list, name='product_list'),
@@ -19,10 +21,6 @@ urlpatterns = [
     path('profile/', views_auth.profile, name='profile'),
 ]
 
-# URL для автентифікації
-urlpatterns += [
-    path('register/', views_auth.register, name='register'),
-    path('login/', views_auth.user_login, name='login'),
-    path('logout/', views_auth.user_logout, name='logout'),
-    path('profile/', views_auth.profile, name='profile'),
-]
+# ДОДАНО: підтримка медіа-файлів (фото)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
