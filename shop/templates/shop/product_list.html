@@ -1,53 +1,342 @@
 {% extends 'shop/base.html' %} {% load static %} {% block content %}
 <div class="products-page">
+    <!-- Фільтри -->
+    <div class="filters-section">
+        <h3><i class="fas fa-filter"></i> Фільтри</h3>
+
+        <form method="get" class="filters-form" id="filter-form">
+            <div class="filter-group">
+                <label><i class="fas fa-search"></i> Пошук</label>
+                <input type="text" name="search" value="{{ search_query|default:'' }}" placeholder="Назва товару...">
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-folder"></i> Категорія</label>
+                <select name="category">
+                    <option value="">Всі категорії</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-hryvnia-sign"></i> Ціна (грн)</label>
+                <div class="price-range">
+                    <input type="number" name="price_min" id="price_min" value="{{ price_min|default:'' }}" placeholder="від" min="0" step="100" oninput="validatePrice(this)">
+                    <span>-</span>
+                    <input type="number" name="price_max" id="price_max" value="{{ price_max|default:'' }}" placeholder="до" min="0" step="100" oninput="validatePrice(this)">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-ruler"></i> Розмір</label>
+                <select name="size">
+                    <option value="">Будь-який</option>
+                    <option value="XS" {% if selected_size == 'XS' %}selected{% endif %}>XS</option>
+                    <option value="S" {% if selected_size == 'S' %}selected{% endif %}>S</option>
+                    <option value="M" {% if selected_size == 'M' %}selected{% endif %}>M</option>
+                    <option value="L" {% if selected_size == 'L' %}selected{% endif %}>L</option>
+                    <option value="XL" {% if selected_size == 'XL' %}selected{% endif %}>XL</option>
+                    <option value="XXL" {% if selected_size == 'XXL' %}selected{% endif %}>XXL</option>
+                    <option value="39" {% if selected_size == '39' %}selected{% endif %}>39</option>
+                    <option value="40" {% if selected_size == '40' %}selected{% endif %}>40</option>
+                    <option value="41" {% if selected_size == '41' %}selected{% endif %}>41</option>
+                    <option value="42" {% if selected_size == '42' %}selected{% endif %}>42</option>
+                    <option value="43" {% if selected_size == '43' %}selected{% endif %}>43</option>
+                    <option value="44" {% if selected_size == '44' %}selected{% endif %}>44</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-sort"></i> Сортувати</label>
+                <select name="sort">
+                    <option value="">За замовчуванням</option>
+                    <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Ціна (спочатку дешевші)</option>
+                    <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Ціна (спочатку дорожчі)</option>
+                    <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>Назва (А-Я)</option>
+                    <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>Назва (Я-А)</option>
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn-filter"><i class="fas fa-check"></i> Застосувати</button>
+                <a href="{% url 'shop:product_list' %}" class="btn-reset"><i class="fas fa-undo"></i> Скинути</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="products-header">
+        <h2><i class="fas fa-box"></i> Всі товари</h2>
+        <span class="products-count">Знайдено: {{ products|length }} товарів</span>
+    </div>
+
     <div class="products-grid">
         {% for product in products %}
         <div class="product-card">
-            {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image"> {% else %}
-            <div class="product-image-placeholder">
-                <i class="fas fa-image"></i>
-                <span>Немає фото</span>
+            <!-- ПРОСТА ІКОНКА ЗАМІСТЬ ФОТО -->
+            <div class="product-icon">
+                <i class="fas fa-tshirt"></i>
             </div>
-            {% endif %}
             <div class="product-info">
                 <h3 class="product-title">{{ product.name }}</h3>
+                <p class="product-category">{{ product.category.name }}</p>
                 <p class="product-price">{{ product.price }} грн</p>
-                <a href="{% url 'shop:product_detail' product.slug %}" class="btn">Детальніше</a>
+                <a href="{% url 'shop:product_detail' product.id %}" class="btn">Детальніше</a>
             </div>
         </div>
         {% empty %}
-        <p>Товарів поки немає</p>
+        <div class="no-products">
+            <i class="fas fa-box-open"></i>
+            <p>Товарів не знайдено</p>
+            <a href="{% url 'shop:product_list' %}" class="btn">Показати всі товари</a>
+        </div>
         {% endfor %}
     </div>
 </div>
 
 <style>
-    .product-image {
-        width: 100%;
-        height: 250px;
-        object-fit: cover;
+    .products-page {
+        max-width: 100%;
     }
     
-    .product-image-placeholder {
-        width: 100%;
-        height: 250px;
-        background: #2a2a2a;
+    .filters-section {
+        background: #222;
+        border: 1px solid #3a3a3a;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .filters-section h3 {
+        color: #8B9A46;
+        margin-bottom: 1.5rem;
+        font-size: 1.2rem;
+    }
+    
+    .filters-form {
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        align-items: flex-end;
+    }
+    
+    .filter-group {
+        flex: 1;
+        min-width: 150px;
+    }
+    
+    .filter-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #d4d4d4;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .filter-group label i {
+        margin-right: 5px;
+        color: #8B9A46;
+    }
+    
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        padding: 8px 12px;
+        background: #1a1a1a;
+        border: 1px solid #3a3a3a;
+        border-radius: 6px;
+        color: #d4d4d4;
+        font-size: 0.9rem;
+    }
+    
+    .price-range {
+        display: flex;
+        gap: 8px;
         align-items: center;
-        justify-content: center;
-        color: #6B7A30;
+    }
+    
+    .price-range input {
+        width: 100%;
+    }
+    
+    .price-range span {
+        color: #d4d4d4;
+    }
+    
+    .filter-actions {
+        display: flex;
         gap: 10px;
     }
     
-    .product-image-placeholder i {
-        font-size: 48px;
+    .btn-filter,
+    .btn-reset {
+        padding: 8px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: 0.3s;
+        border: none;
     }
     
-    .product-image-placeholder span {
-        font-size: 14px;
+    .btn-filter {
+        background: #4a5f2e;
+        color: white;
+    }
+    
+    .btn-filter:hover {
+        background: #3a4f1e;
+    }
+    
+    .btn-reset {
+        background: #2a2a2a;
+        color: #d4d4d4;
+        border: 1px solid #3a3a3a;
+    }
+    
+    .btn-reset:hover {
+        background: #3a3a3a;
+    }
+    
+    .products-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 2rem 0 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .products-header h2 {
+        color: #8B9A46;
+        font-size: 1.3rem;
+    }
+    
+    .products-count {
         color: #888;
+        font-size: 0.9rem;
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .product-card {
+        background: #222;
+        border: 1px solid #2a2a2a;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.3s;
+        text-align: center;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        border-color: #4a5f2e;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+    /* ІКОНКА ЗАМІСТЬ ФОТО */
+    
+    .product-icon {
+        width: 100%;
+        height: 180px;
+        background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #3a3a3a;
+    }
+    
+    .product-icon i {
+        font-size: 64px;
+        color: #4a5f2e;
+        opacity: 0.6;
+    }
+    
+    .product-info {
+        padding: 1.2rem;
+    }
+    
+    .product-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #e0e0e0;
+    }
+    
+    .product-category {
+        font-size: 0.8rem;
+        color: #6B7A30;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-price {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #8B9A46;
+        margin: 0.5rem 0;
+    }
+    
+    .btn {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: #2a2a2a;
+        color: #d4d4d4;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: 0.3s;
+        text-align: center;
+        border: 1px solid #4a5f2e;
+        font-size: 0.85rem;
+    }
+    
+    .btn:hover {
+        background: #4a5f2e;
+        color: white;
+    }
+    
+    .no-products {
+        text-align: center;
+        padding: 3rem;
+        color: #888;
+    }
+    
+    .no-products i {
+        font-size: 48px;
+        margin-bottom: 1rem;
+        color: #4a5f2e;
+    }
+    
+    @media (max-width: 768px) {
+        .filters-form {
+            flex-direction: column;
+        }
+        .filter-group {
+            width: 100%;
+        }
+        .filter-actions {
+            width: 100%;
+        }
+        .btn-filter,
+        .btn-reset {
+            flex: 1;
+            text-align: center;
+        }
+        .products-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        .product-icon {
+            height: 120px;
+        }
+        .product-icon i {
+            font-size: 48px;
+        }
     }
 </style>
 {% endblock %}

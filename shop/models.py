@@ -22,9 +22,8 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    # ДОДАНО ПОЛЕ ДЛЯ ФОТО
-    image = models.ImageField(upload_to='products/%Y/%m/%d/', blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # Це правильно
+    image_url = models.URLField(max_length=500, blank=True, null=True, verbose_name='Посилання на фото')
     stock = models.PositiveIntegerField(default=0)
     available = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -37,7 +36,7 @@ class Product(models.Model):
         return self.name
     
     def get_absolute_url(self):
-        return reverse('shop:product_detail', args=[self.slug])
+        return reverse('shop:product_detail', args=[self.id])
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
@@ -70,4 +69,4 @@ class OrderItem(models.Model):
         return f'{self.id}'
     
     def get_cost(self):
-        return self.price * self.quantity  # ВИПРАВЛЕНО: quantity замість quantit
+        return self.price * self.quantity

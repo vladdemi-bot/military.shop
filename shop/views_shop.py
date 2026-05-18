@@ -4,38 +4,94 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.db.models import Q
 from .models import Category, Product
 from .cart import Cart
 
 
+def home(request):
+    """Головна сторінка з описом магазину"""
+    return render(request, 'shop/home.html')
+
+
 def product_list(request, category_slug=None):
-    category = None
     categories = Category.objects.all()
     products = Product.objects.filter(available=True)
     
+    # Фільтр за категорією
+    category = None
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
         products = products.filter(category=category)
     
-    return render(request, 'shop/product_list.html', {
+    # Фільтр за категорією з GET-параметра
+    cat_filter = request.GET.get('category')
+    if cat_filter:
+        products = products.filter(category__slug=cat_filter)
+    
+    # Фільтр за ціною
+    price_min = request.GET.get('price_min')
+    price_max = request.GET.get('price_max')
+    if price_min:
+        products = products.filter(price__gte=price_min)
+    if price_max:
+        products = products.filter(price__lte=price_max)
+    
+    # Фільтр за розміром
+    size = request.GET.get('size')
+    if size:
+        products = products.filter(description__icontains=size)
+    
+    # Пошук за назвою
+    search_query = request.GET.get('search')
+    if search_query:
+        products = products.filter(Q(name__icontains=search_query) | Q(description__icontains=search_query))
+    
+    # Сортування
+    sort_by = request.GET.get('sort')
+    if sort_by == 'price_asc':
+        products = products.order_by('price')
+    elif sort_by == 'price_desc':
+        products = products.order_by('-price')
+    elif sort_by == 'name_asc':
+        products = products.order_by('name')
+    elif sort_by == 'name_desc':
+        products = products.order_by('-name')
+    else:
+        products = products.order_by('-created')
+    
+    context = {
         'category': category,
         'categories': categories,
         'products': products,
-    })
-
-
-def product_detail(request, product_slug):
-    product = get_object_or_404(Product, slug=product_slug, available=True)
-    cart = Cart(request)
-    cart_items = cart.cart.values()
+        'selected_category': cat_filter or category_slug,
+        'price_min': price_min,
+        'price_max': price_max,
+        'selected_size': size,
+        'search_query': search_query,
+        'sort_by': sort_by,
+    }
     
-    return render(request, 'shop/product_detail.html', {
+    return render(request, 'shop/product_list.html', context)
+
+
+def product_detail(request, id):  # тепер id замість product_slug
+    """Детальна сторінка товару"""
+    product = get_object_or_404(Product, id=id, available=True)
+    
+    # Схожі товари (з тієї ж категорії)
+    similar_products = Product.objects.filter(
+        category=product.category, 
+        available=True
+    ).exclude(id=product.id)[:4]
+    
+    context = {
         'product': product,
-        'cart_items': cart_items,
-    })
+        'similar_products': similar_products,
+    }
+    
+    return render(request, 'shop/product_detail.html', context)
 
-
-@login_required
 def cart_detail(request):
     cart = Cart(request)
     return render(request, 'shop/cart_detail.html', {'cart': cart})
@@ -43,9 +99,15 @@ def cart_detail(request):
 
 def cart_add(request, product_id):
     cart = Cart(request)
-    product = get_object_or_404(Product, id=product_id)
-    cart.add(product=product, quantity=1)
-    return redirect('shop:cart_detail')
+    product = get_object_or_404(Product, id=product_id, available=True)
+    
+    # Отримуємо кількість з POST запиту
+    quantity = int(request.POST.get('quantity', 1))
+    cart.add(product=product, quantity=quantity)
+    
+    # Повертаємося на ту ж сторінку
+    next_url = request.POST.get('next', 'shop:cart_detail')
+    return redirect(next_url)
 
 
 def cart_remove(request, product_id):
@@ -57,11 +119,10 @@ def cart_remove(request, product_id):
 
 def cart_count(request):
     cart = Cart(request)
-    return JsonResponse({'count': len(cart)})
+    return JsonResponse({'count': cart.__len__()})
 
 
-# ========== НОВІ ФУНКЦІЇ ДЛЯ РЕЄСТРАЦІЇ ==========
-
+# Аутентифікація
 def register(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -105,9 +166,83 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     messages.success(request, 'Ви вийшли з системи')
-    return redirect('shop:product_list')
+    return redirect('shop:home')
 
 
 @login_required
 def profile(request):
     return render(request, 'shop/profile.html', {'user': request.user})
+
+def product_list(request, category_slug=None):
+    categories = Category.objects.all()
+    products = Product.objects.filter(available=True)
+    
+    # Фільтр за категорією
+    category = None
+    if category_slug:
+        category = get_object_or_404(Category, slug=category_slug)
+        products = products.filter(category=category)
+    
+    # Фільтр за категорією з GET-параметра
+    cat_filter = request.GET.get('category')
+    if cat_filter and cat_filter != '':
+        products = products.filter(category__slug=cat_filter)
+    
+    # Фільтр за ціною (з перевіркою та конвертацією в число)
+    price_min = request.GET.get('price_min')
+    price_max = request.GET.get('price_max')
+    
+    try:
+        if price_min and price_min != '':
+            price_min = float(price_min)
+            if price_min < 0:
+                price_min = 0
+            products = products.filter(price__gte=price_min)
+    except (ValueError, TypeError):
+        price_min = ''
+    
+    try:
+        if price_max and price_max != '':
+            price_max = float(price_max)
+            if price_max < 0:
+                price_max = 0
+            products = products.filter(price__lte=price_max)
+    except (ValueError, TypeError):
+        price_max = ''
+    
+    # Фільтр за розміром
+    size = request.GET.get('size')
+    if size and size != '':
+        products = products.filter(description__icontains=size)
+    
+    # Пошук за назвою
+    search_query = request.GET.get('search')
+    if search_query and search_query != '':
+        products = products.filter(Q(name__icontains=search_query) | Q(description__icontains=search_query))
+    
+    # Сортування (ВАЖЛИВО: сортування за числом, а не рядком)
+    sort_by = request.GET.get('sort')
+    if sort_by == 'price_asc':
+        products = products.order_by('price')  # price - це DecimalField, сортується правильно
+    elif sort_by == 'price_desc':
+        products = products.order_by('-price')
+    elif sort_by == 'name_asc':
+        products = products.order_by('name')
+    elif sort_by == 'name_desc':
+        products = products.order_by('-name')
+    else:
+        products = products.order_by('-created')
+    
+    context = {
+        'category': category,
+        'categories': categories,
+        'products': products,
+        'selected_category': cat_filter or category_slug,
+        'price_min': price_min if price_min != '' else '',
+        'price_max': price_max if price_max != '' else '',
+        'selected_size': size,
+        'search_query': search_query,
+        'sort_by': sort_by,
+    }
+    
+    return render(request, 'shop/product_list.html', context)

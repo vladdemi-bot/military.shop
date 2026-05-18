@@ -58,21 +58,42 @@
         .nav-links {
             display: flex;
             list-style: none;
-            gap: 2rem;
+            gap: 0.5rem;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
         
-        .nav-links a {
+        .nav-links li {
+            margin: 0;
+            white-space: nowrap;
+        }
+        
+        .nav-links a,
+        .btn-logout {
             color: #d4d4d4;
             text-decoration: none;
             font-weight: 500;
             transition: 0.3s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            white-space: nowrap;
         }
         
-        .nav-links a:hover {
-            color: #8B9A46;
+        .nav-links a:hover,
+        .btn-logout:hover {
+            background: #4a5f2e;
+            color: white;
         }
         
         .btn-logout {
@@ -106,6 +127,12 @@
             margin: 40px auto;
             padding: 0 30px;
             gap: 40px;
+            width: 100%;
+        }
+        
+        .content-area {
+            flex: 1;
+            min-width: 0;
         }
         /* ЛІВИЙ САЙДБАР - АКУРАТНИЙ, ПРИТИСНУТИЙ ДО КРАЮ */
         
@@ -393,27 +420,25 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <a href="{% url 'shop:product_list' %}">
+                <a href="{% url 'shop:home' %}">
                     <i class="fas fa-store"></i>
                     <span>Мілітарка</span>
                 </a>
             </div>
 
-            <div class="nav-toggle" id="navToggle">
-                <i class="fas fa-bars"></i>
-            </div>
-
             <ul class="nav-links" id="navLinks">
-                <li><a href="{% url 'shop:product_list' %}"><i class="fas fa-home"></i> Головна</a></li>
+                <li><a href="{% url 'shop:home' %}"><i class="fas fa-home"></i> Головна</a></li>
                 <li><a href="{% url 'shop:product_list' %}"><i class="fas fa-box"></i> Всі товари</a></li>
 
                 {% if request.user.is_authenticated %}
                 <li><a href="{% url 'shop:profile' %}"><i class="fas fa-user"></i> Профіль</a></li>
                 <li><a href="{% url 'shop:cart_detail' %}"><i class="fas fa-shopping-cart"></i> Кошик <span class="cart-count" id="cartCount">0</span></a></li>
                 <li>
-                    <form action="{% url 'shop:logout' %}" method="post" style="display:inline;">
+                    <form action="{% url 'shop:logout' %}" method="post" style="display: inline; margin: 0;">
                         {% csrf_token %}
-                        <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Вихід</button>
+                        <button type="submit" class="btn-logout" style="background: none; border: none; color: #d4d4d4; cursor: pointer; font-size: 1rem; padding: 0.5rem 1rem;">
+                            <i class="fas fa-sign-out-alt"></i> Вихід
+                        </button>
                     </form>
                 </li>
                 {% else %}
@@ -440,26 +465,17 @@
     <!-- Основний контент -->
     <div class="main-layout">
         <!-- Лівий сайдбар -->
+        <!-- Лівий сайдбар - тільки категорії -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <h3><i class="fas fa-folder-open"></i> КАТЕГОРІЇ</h3>
             </div>
             <ul class="category-list">
-                <li><a href="{% url 'shop:product_list' %}"><i class="fas fa-tags"></i> Всі товари</a></li>
                 <li><a href="{% url 'shop:product_list' %}?category=footwear"><i class="fas fa-shoe-prints"></i> Взуття</a></li>
                 <li><a href="{% url 'shop:product_list' %}?category=clothing"><i class="fas fa-tshirt"></i> Одяг</a></li>
                 <li><a href="{% url 'shop:product_list' %}?category=gear"><i class="fas fa-backpack"></i> Спорядження</a></li>
                 <li><a href="{% url 'shop:product_list' %}?category=tactical"><i class="fas fa-vest"></i> Тактичне</a></li>
             </ul>
-            <!-- ВИДАЛІТЬ ЦЕ -->
-            <div class="sidebar-section">
-                <h4><i class="fas fa-info-circle"></i> ІНФОРМАЦІЯ</h4>
-                <ul class="category-list">
-                    <li><a href="#"><i class="fas fa-truck"></i> Доставка</a></li>
-                    <li><a href="#"><i class="fas fa-shield-alt"></i> Гарантія</a></li>
-                    <li><a href="#"><i class="fas fa-credit-card"></i> Оплата</a></li>
-                </ul>
-            </div>
         </div>
 
         <!-- Правий контент -->
@@ -484,7 +500,7 @@
             <div class="footer-section">
                 <h4>Контакти</h4>
                 <p><i class="fas fa-envelope"></i> info@myshop.com</p>
-                <p><i class="fas fa-phone"></i> +380 (99) 123-45-67</p>
+                <p><i class="fas fa-phone"></i> +380 (067) 725 43 76</p>
                 <p><i class="fas fa-map-marker-alt"></i> м. Кропивницький, Україна</p>
             </div>
         </div>

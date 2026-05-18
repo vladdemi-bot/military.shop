@@ -1,16 +1,14 @@
 from django.urls import path
-from django.conf import settings
-from django.conf.urls.static import static
 from . import views_shop
 from . import views_auth
 
 app_name = 'shop'
 
 urlpatterns = [
-    path('', views_shop.product_list, name='product_list'),
+    path('', views_shop.home, name='home'),
     path('products/', views_shop.product_list, name='product_list'),
     path('category/<slug:category_slug>/', views_shop.product_list, name='category_detail'),
-    path('product/<slug:product_slug>/', views_shop.product_detail, name='product_detail'),
+    path('product/<int:id>/', views_shop.product_detail, name='product_detail'),  # ЗМІНИВ: тепер id замість slug
     path('cart/', views_shop.cart_detail, name='cart_detail'),
     path('cart/add/<int:product_id>/', views_shop.cart_add, name='cart_add'),
     path('cart/remove/<int:product_id>/', views_shop.cart_remove, name='cart_remove'),
@@ -20,7 +18,3 @@ urlpatterns = [
     path('logout/', views_auth.user_logout, name='logout'),
     path('profile/', views_auth.profile, name='profile'),
 ]
-
-# ДОДАНО: підтримка медіа-файлів (фото)
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

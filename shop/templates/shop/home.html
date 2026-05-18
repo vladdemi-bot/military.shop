@@ -1,159 +1,319 @@
-{% extends 'shop/base.html' %} {% block title %}Головна сторінка{% endblock %} {% block content %}
-<div class="hero shop-hero">
-    <h1>Ласкаво просимо до <span class="highlight">Мого Магазину</span>!</h1>
-    <p>Найкращі товари за найкращими цінами</p>
-    <div class="hero-buttons">
-        <a href="{% url 'shop:product_list' %}" class="btn-primary">
-            <i class="fas fa-shopping-cart"></i> Перейти до товарів
-        </a>
-        {% if not request.user.is_authenticated %}
-        <a href="{% url 'register' %}" class="btn-secondary">
-            <i class="fas fa-user-plus"></i> Зареєструватися
-        </a>
-        {% endif %}
+{% extends 'shop/base.html' %} {% load static %} {% block content %}
+<!-- Головний банер -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1>МІЛІТАРКА</h1>
+        <p>Ваш надійний партнер у світі військового спорядження</p>
+        <div class="hero-buttons">
+            <a href="{% url 'shop:product_list' %}" class="btn-hero"><i class="fas fa-store"></i> Перейти до магазину</a>
+            <a href="#about" class="btn-hero-secondary"><i class="fas fa-info-circle"></i> Дізнатись більше</a>
+        </div>
     </div>
 </div>
 
-<div class="features">
-    <h2>Чому обирають нас?</h2>
-    <div class="features-grid">
-        <div class="feature-card">
-            <i class="fas fa-truck"></i>
-            <h3>Швидка доставка</h3>
-            <p>Доставка по всій Україні</p>
+<!-- Про магазин -->
+<div id="about" class="about-section">
+    <h2><i class="fas fa-info-circle"></i> Хто ми?</h2>
+    <p>Магазин <strong>«Мілітарка»</strong> — це спеціалізований постачальник військового спорядження, тактичного одягу та екіпірування. Ми працюємо з 2014 року та маємо великий досвід у забезпеченні силових структур та цивільних осіб якісним спорядженням.</p>
+    <p>Наша місія — забезпечити кожного захисника та захисницю України надійним та якісним спорядженням, яке рятує життя. Ми співпрацюємо безпосередньо з виробниками, тому гарантуємо оригінальність та найкращі ціни.</p>
+</div>
+
+<!-- Для кого ми працюємо -->
+<div class="for-who-section">
+    <h2><i class="fas fa-users"></i> Для кого ми працюємо</h2>
+    <div class="cards-grid">
+        <div class="card">
+            <i class="fas fa-shield-virus"></i>
+            <h3>ЗСУ</h3>
+            <p>Тактичне спорядження, форма, берці, розгрузки для військовослужбовців Збройних Сил України</p>
+            <span class="card-tag">Дія ЗСУ</span>
         </div>
-        <div class="feature-card">
-            <i class="fas fa-credit-card"></i>
-            <h3>Безпечна оплата</h3>
-            <p>Безпечні способи оплати</p>
+        <div class="card">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Національна поліція</h3>
+            <p>Спеціалізоване спорядження для патрульної поліції, КОРД, спецпідрозділів</p>
+            <span class="card-tag">Ліцензія</span>
         </div>
-        <div class="feature-card">
+        <div class="card">
+            <i class="fas fa-fire-extinguisher"></i>
+            <h3>ДСНС</h3>
+            <p>Спорядження для рятувальників, пожежників, захисний одяг та взуття</p>
+            <span class="card-tag">Сертифікати</span>
+        </div>
+        <div class="card">
+            <i class="fas fa-user-secret"></i>
+            <h3>НГУ</h3>
+            <p>Екіпірування для Національної гвардії, спецпідрозділів та охоронних структур</p>
+            <span class="card-tag">Договори</span>
+        </div>
+        <div class="card">
+            <i class="fas fa-industry"></i>
+            <h3>Цивільні</h3>
+            <p>Тактичний одяг, взуття, спорядження для активного відпочинку, мисливців, страйкболістів</p>
+            <span class="card-tag">Роздріб</span>
+        </div>
+        <div class="card">
+            <i class="fas fa-building"></i>
+            <h3>Юридичні особи</h3>
+            <p>Оптові поставки для підприємств, військових частин, державних установ</p>
+            <span class="card-tag">Тендери</span>
+        </div>
+    </div>
+</div>
+
+<!-- Переваги -->
+<div class="advantages-section">
+    <h2><i class="fas fa-star"></i> Наші переваги</h2>
+    <div class="advantages-grid">
+        <div class="advantage">
+            <i class="fas fa-check-circle"></i>
+            <h4>Тільки оригінал</h4>
+            <p>Ми співпрацюємо напряму з виробниками та офіційними дистриб'юторами</p>
+        </div>
+        <div class="advantage">
+            <i class="fas fa-clock"></i>
+            <h4>Швидка доставка</h4>
+            <p>Нова Пошта, Укрпошта, Доставка по всій Україні за 1-2 дні</p>
+        </div>
+        <div class="advantage">
             <i class="fas fa-undo-alt"></i>
-            <h3>Повернення товару</h3>
-            <p>14 днів на повернення</p>
+            <h4>Обмін та повернення</h4>
+            <p>Гарантія 14 днів на обмін/повернення товару</p>
         </div>
-        <div class="feature-card">
-            <i class="fas fa-headset"></i>
-            <h3>Підтримка 24/7</h3>
-            <p>Консультації у будь-який час</p>
+        <div class="advantage">
+            <i class="fas fa-percent"></i>
+            <h4>Знижки для військових</h4>
+            <p>Постійна знижка 10% для військовослужбовців ЗСУ</p>
         </div>
+    </div>
+</div>
+
+<!-- Партнери -->
+<div class="partners-section">
+    <h2><i class="fas fa-handshake"></i> Наші партнери</h2>
+    <div class="partners-logos">
+        <span>M-TAC</span>
+        <span>P1G-Tac</span>
+        <span>UA-Tac</span>
+        <span>Кобра</span>
+        <span>Temp-3000</span>
+        <span>Active Gear</span>
+        <span>GSG</span>
+        <span>Mil-Tec</span>
     </div>
 </div>
 
 <style>
-    .shop-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        text-align: center;
+    .hero-section {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+        border-radius: 15px;
         padding: 4rem 2rem;
-        border-radius: 30px;
-        margin-bottom: 3rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        border-bottom: 3px solid #4a5f2e;
     }
     
-    .shop-hero h1 {
+    .hero-content h1 {
         font-size: 3rem;
+        color: #8B9A46;
         margin-bottom: 1rem;
-        color: white;
+        letter-spacing: 5px;
     }
     
-    .shop-hero .highlight {
-        color: #ffd700;
-    }
-    
-    .shop-hero p {
+    .hero-content p {
         font-size: 1.2rem;
-        color: rgba(255, 255, 255, 0.9);
+        color: #d4d4d4;
         margin-bottom: 2rem;
     }
     
     .hero-buttons {
         display: flex;
-        gap: 1rem;
         justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
     }
     
-    .btn-primary,
-    .btn-secondary {
-        padding: 1rem 2rem;
-        border-radius: 50px;
+    .btn-hero {
+        display: inline-block;
+        padding: 12px 30px;
+        background: #4a5f2e;
+        color: white;
         text-decoration: none;
+        border-radius: 30px;
+        transition: 0.3s;
         font-weight: 600;
-        transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
     }
     
-    .btn-primary {
-        background: #ffd700;
-        color: #333;
+    .btn-hero:hover {
+        background: #3a4f1e;
+        transform: translateY(-2px);
     }
     
-    .btn-primary:hover {
-        background: #ffed4a;
-        transform: translateY(-3px);
+    .btn-hero-secondary {
+        display: inline-block;
+        padding: 12px 30px;
+        background: transparent;
+        color: #8B9A46;
+        text-decoration: none;
+        border-radius: 30px;
+        transition: 0.3s;
+        font-weight: 600;
+        border: 1px solid #4a5f2e;
     }
     
-    .btn-secondary {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
+    .btn-hero-secondary:hover {
+        background: #2a2a2a;
+        transform: translateY(-2px);
     }
     
-    .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: translateY(-3px);
-    }
-    
-    .features {
-        margin-bottom: 2rem;
-    }
-    
-    .features h2 {
-        text-align: center;
-        color: white;
-        margin-bottom: 2rem;
-        font-size: 2rem;
-    }
-    
-    .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 2rem;
-    }
-    
-    .feature-card {
-        background: white;
+    .about-section {
+        background: #222;
+        border-radius: 10px;
         padding: 2rem;
-        border-radius: 15px;
-        text-align: center;
-        transition: all 0.3s;
+        margin-bottom: 2rem;
+        border-left: 4px solid #4a5f2e;
     }
     
-    .feature-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    .about-section h2 {
+        color: #8B9A46;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
     }
     
-    .feature-card i {
-        font-size: 3rem;
-        color: #667eea;
+    .about-section p {
+        line-height: 1.6;
+        color: #d4d4d4;
         margin-bottom: 1rem;
     }
     
-    .feature-card h3 {
-        margin-bottom: 0.5rem;
-        color: #333;
+    .for-who-section,
+    .advantages-section,
+    .partners-section {
+        margin-bottom: 2rem;
     }
     
-    .feature-card p {
-        color: #666;
+    .for-who-section h2,
+    .advantages-section h2,
+    .partners-section h2 {
+        color: #8B9A46;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+    
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .card {
+        background: #222;
+        border: 1px solid #3a3a3a;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        border-color: #4a5f2e;
+    }
+    
+    .card i {
+        font-size: 2.5rem;
+        color: #8B9A46;
+        margin-bottom: 1rem;
+    }
+    
+    .card h3 {
+        color: #e0e0e0;
+        margin-bottom: 0.8rem;
+    }
+    
+    .card p {
+        color: #b0b0b0;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+    
+    .card-tag {
+        display: inline-block;
+        background: #2a2a2a;
+        padding: 0.3rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        color: #8B9A46;
+    }
+    
+    .advantages-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .advantage {
+        background: #222;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .advantage i {
+        font-size: 2rem;
+        color: #8B9A46;
+        margin-bottom: 0.8rem;
+    }
+    
+    .advantage h4 {
+        color: #e0e0e0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .advantage p {
+        color: #b0b0b0;
+        font-size: 0.85rem;
+    }
+    
+    .partners-logos {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 2rem;
+        background: #222;
+        border-radius: 10px;
+        padding: 2rem;
+    }
+    
+    .partners-logos span {
+        color: #8B9A46;
+        font-weight: bold;
+        font-size: 1.1rem;
+        padding: 0.5rem 1.5rem;
+        background: #2a2a2a;
+        border-radius: 5px;
+        transition: 0.3s;
+    }
+    
+    .partners-logos span:hover {
+        background: #4a5f2e;
+        color: white;
+        transform: translateY(-3px);
     }
     
     @media (max-width: 768px) {
-        .shop-hero h1 {
+        .hero-section {
+            padding: 2rem 1rem;
+        }
+        .hero-content h1 {
             font-size: 2rem;
         }
-        .hero-buttons {
-            flex-direction: column;
+        .cards-grid {
+            grid-template-columns: 1fr;
+        }
+        .advantages-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>

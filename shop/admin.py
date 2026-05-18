@@ -12,8 +12,6 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ['available', 'created', 'updated']
     list_editable = ['price', 'stock', 'available']
     prepopulated_fields = {'slug': ('name',)}
-    # Просто додали поле image
-    fields = ['category', 'name', 'slug', 'description', 'price', 'image', 'stock', 'available']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
