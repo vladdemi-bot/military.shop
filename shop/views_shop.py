@@ -246,3 +246,26 @@ def product_list(request, category_slug=None):
     }
     
     return render(request, 'shop/product_list.html', context)
+
+from .models import Review
+
+@login_required
+def add_review(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+        
+        if rating and comment:
+            Review.objects.create(
+                product=product,
+                user=request.user,
+                rating=int(rating),
+                comment=comment
+            )
+            messages.success(request, 'Дякуємо за ваш відгук!')
+        else:
+            messages.error(request, 'Будь ласка, заповніть всі поля')
+    
+    return redirect('shop:product_detail', id=product_id)

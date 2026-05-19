@@ -1,7 +1,16 @@
 {% extends 'shop/base.html' %} {% load static %} {% block content %}
 <div class="product-detail-container">
     <div class="product-detail-grid">
-        <!-- Інформація про товар -->
+        <div class="product-detail-image">
+            {% if product.image_url %}
+            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-detail-img"> {% else %}
+            <div class="product-image-placeholder">
+                <i class="fas fa-tshirt"></i>
+                <span>Немає фото</span>
+            </div>
+            {% endif %}
+        </div>
+
         <div class="product-detail-info">
             <h1 class="product-detail-title">{{ product.name }}</h1>
             <p class="product-detail-category">
@@ -12,23 +21,40 @@
             </div>
             <div class="product-detail-stock">
                 {% if product.stock > 0 %}
-                <span class="in-stock"><i class="fas fa-check-circle"></i> В наявності</span> {% else %}
+                <span class="in-stock"><i class="fas fa-check-circle"></i> В наявності</span>
+                <span class="stock-count">(Залишилось: {{ product.stock }} шт.)</span> {% else %}
                 <span class="out-of-stock"><i class="fas fa-times-circle"></i> Немає в наявності</span> {% endif %}
             </div>
 
             <div class="product-detail-description">
-                <h3>Опис товару</h3>
-                <p>{{ product.description }}</p>
+                <h3><i class="fas fa-align-left"></i> Опис товару</h3>
+                <div class="description-content" id="descriptionContent">
+                    <p>{{ product.description }}</p>
+                </div>
+                <button class="btn-read-more" id="readMoreBtn" onclick="toggleDescription()">
+                    <i class="fas fa-chevron-down"></i> Показати більше
+                </button>
             </div>
 
-            <!-- Форма додавання в кошик -->
+            <div class="product-features">
+                <h3><i class="fas fa-star"></i> Характеристики</h3>
+                <ul class="features-list">
+                    <li><i class="fas fa-check"></i> Висока якість</li>
+                    <li><i class="fas fa-check"></i> Оригінальна продукція</li>
+                    <li><i class="fas fa-check"></i> Гарантія якості</li>
+                    <li><i class="fas fa-check"></i> Швидка доставка</li>
+                </ul>
+            </div>
+
             {% if product.stock > 0 %}
             <form method="post" action="{% url 'shop:cart_add' product.id %}" class="add-to-cart-form">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{% url 'shop:product_detail' product.id %}">
                 <div class="quantity-selector">
                     <label for="quantity">Кількість:</label>
+                    <button type="button" class="qty-btn" onclick="changeQty(-1)">-</button>
                     <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}">
+                    <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
                 </div>
                 <button type="submit" class="btn-add-to-cart">
                     <i class="fas fa-shopping-cart"></i> Додати в кошик
@@ -47,24 +73,135 @@
         </div>
     </div>
 
-    <!-- Схожі товари -->
-    {% if similar_products %}
-    <div class="similar-products">
-        <h3><i class="fas fa-heart"></i> Схожі товари</h3>
-        <div class="similar-products-grid">
-            {% for similar in similar_products %}
-            <div class="similar-product-card">
-                <div class="similar-product-info">
-                    <h4>{{ similar.name }}</h4>
-                    <p class="similar-product-price">{{ similar.price }} грн</p>
-                    <a href="{% url 'shop:product_detail' similar.id %}" class="btn-similar">Переглянути</a>
+    <div class="reviews-section">
+        <h3><i class="fas fa-comments"></i> Відгуки</h3>
+
+        {% if user.is_authenticated %}
+        <div class="review-form-container">
+            <h4>Залишити відгук</h4>
+            <form method="post" action="{% url 'shop:add_review' product.id %}" class="review-form">
+                {% csrf_token %}
+                <div class="rating-selector">
+                    <span>Ваша оцінка:</span>
+                    <div class="stars">
+                        <input type="radio" name="rating" id="star5" value="5"><label for="star5">★</label>
+                        <input type="radio" name="rating" id="star4" value="4"><label for="star4">★</label>
+                        <input type="radio" name="rating" id="star3" value="3"><label for="star3">★</label>
+                        <input type="radio" name="rating" id="star2" value="2"><label for="star2">★</label>
+                        <input type="radio" name="rating" id="star1" value="1"><label for="star1">★</label>
+                    </div>
                 </div>
+                <textarea name="comment" placeholder="Ваш відгук..." rows="3" required></textarea>
+                <button type="submit" class="btn-submit-review">
+                    <i class="fas fa-paper-plane"></i> Відправити відгук
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div class="login-to-review">
+            <i class="fas fa-lock"></i>
+            <p><a href="{% url 'shop:login' %}">Увійдіть</a>, щоб залишити відгук</p>
+        </div>
+        {% endif %}
+
+        <div class="reviews-section">
+            <h3><i class="fas fa-comments"></i> Відгуки</h3>
+
+            {% if user.is_authenticated %}
+            <div class="review-form-container">
+                <h4>Залишити відгук</h4>
+                <form method="post" action="{% url 'shop:add_review' product.id %}">
+                    {% csrf_token %}
+                    <textarea name="comment" placeholder="Ваш відгук..." rows="3" required></textarea>
+                    <button type="submit" class="btn-submit-review">Відправити відгук</button>
+                </form>
             </div>
-            {% endfor %}
+            {% else %}
+            <div class="login-to-review">
+                <p><a href="{% url 'shop:login' %}">Увійдіть</a>, щоб залишити відгук</p>
+            </div>
+            {% endif %}
+
+            <div class="reviews-list">
+                {% for review in product.reviews.all %}
+                <div class="review-card">
+                    <div class="review-header">
+                        <strong>{{ review.user.username }}</strong>
+                        <span>{{ review.created|date:"d.m.Y" }}</span>
+                    </div>
+                    <div class="review-content">
+                        <p>{{ review.comment }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-reviews">
+                    <p>Ще немає відгуків. Будьте першим!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="no-reviews">
+            <i class="fas fa-comment-slash"></i>
+            <p>Ще немає відгуків. Будьте першим!</p>
         </div>
     </div>
-    {% endif %}
 </div>
+
+{% if similar_products %}
+<div class="similar-products">
+    <h3><i class="fas fa-heart"></i> Схожі товари</h3>
+    <div class="similar-products-grid">
+        {% for similar in similar_products %}
+        <div class="similar-product-card">
+            <div class="similar-product-image">
+                {% if similar.image_url %}
+                <img src="{{ similar.image_url }}" alt="{{ similar.name }}"> {% else %}
+                <i class="fas fa-tshirt"></i> {% endif %}
+            </div>
+            <div class="similar-product-info">
+                <h4>{{ similar.name }}</h4>
+                <p class="similar-product-price">{{ similar.price }} грн</p>
+                <a href="{% url 'shop:product_detail' similar.id %}" class="btn-similar">Переглянути</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+</div>
+
+<script>
+    function changeQty(delta) {
+        let input = document.getElementById('quantity');
+        let newVal = parseInt(input.value) + delta;
+        let min = parseInt(input.min) || 1;
+        let max = parseInt(input.max) || 999;
+        if (newVal >= min && newVal <= max) {
+            input.value = newVal;
+        }
+    }
+
+    function toggleDescription() {
+        let content = document.getElementById('descriptionContent');
+        let btn = document.getElementById('readMoreBtn');
+        if (content.classList.contains('expanded')) {
+            content.classList.remove('expanded');
+            btn.innerHTML = '<i class="fas fa-chevron-down"></i> Показати більше';
+        } else {
+            content.classList.add('expanded');
+            btn.innerHTML = '<i class="fas fa-chevron-up"></i> Показати менше';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        let content = document.getElementById('descriptionContent');
+        let btn = document.getElementById('readMoreBtn');
+        if (content && content.scrollHeight <= 100) {
+            btn.style.display = 'none';
+        }
+    });
+</script>
 
 <style>
     .product-detail-container {
@@ -77,9 +214,45 @@
         flex-wrap: wrap;
     }
     
+    .product-detail-image {
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .product-detail-img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        border: 1px solid #3a3a3a;
+    }
+    
+    .product-image-placeholder {
+        width: 100%;
+        height: 350px;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #6B7A30;
+        gap: 10px;
+        border-radius: 10px;
+        border: 1px solid #3a3a3a;
+    }
+    
+    .product-image-placeholder i {
+        font-size: 64px;
+        opacity: 0.5;
+    }
+    
+    .product-image-placeholder span {
+        font-size: 14px;
+        color: #888;
+    }
+    
     .product-detail-info {
         flex: 1;
-        min-width: 280px;
+        min-width: 320px;
     }
     
     .product-detail-title {
@@ -108,6 +281,12 @@
         color: #4caf50;
     }
     
+    .stock-count {
+        color: #888;
+        margin-left: 10px;
+        font-size: 0.9rem;
+    }
+    
     .out-of-stock {
         color: #f44336;
     }
@@ -124,9 +303,68 @@
         margin-bottom: 1rem;
     }
     
-    .product-detail-description p {
+    .description-content {
+        max-height: 100px;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    
+    .description-content.expanded {
+        max-height: 1000px;
+    }
+    
+    .description-content p {
         line-height: 1.6;
         color: #d4d4d4;
+    }
+    
+    .btn-read-more {
+        background: none;
+        border: none;
+        color: #8B9A46;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        padding: 5px 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .btn-read-more:hover {
+        color: #a5b85a;
+    }
+    
+    .product-features {
+        background: #222;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    
+    .product-features h3 {
+        color: #8B9A46;
+        margin-bottom: 1rem;
+    }
+    
+    .features-list {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+    }
+    
+    .features-list li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #d4d4d4;
+        font-size: 0.9rem;
+    }
+    
+    .features-list li i {
+        color: #4caf50;
+        font-size: 0.8rem;
     }
     
     .add-to-cart-form {
@@ -140,21 +378,41 @@
     .quantity-selector {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 5px;
+        background: #2a2a2a;
+        border-radius: 5px;
+        border: 1px solid #4a5f2e;
     }
     
     .quantity-selector label {
+        padding-left: 10px;
         color: #d4d4d4;
     }
     
-    .quantity-selector input {
-        width: 70px;
-        padding: 10px;
+    .qty-btn {
+        width: 30px;
+        height: 40px;
         background: #2a2a2a;
-        border: 1px solid #4a5f2e;
-        border-radius: 5px;
+        border: none;
+        color: #8B9A46;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    
+    .qty-btn:hover {
+        background: #4a5f2e;
+        color: white;
+    }
+    
+    .quantity-selector input {
+        width: 50px;
+        height: 40px;
+        background: #2a2a2a;
+        border: none;
         color: #d4d4d4;
         text-align: center;
+        font-size: 1rem;
     }
     
     .btn-add-to-cart {
@@ -166,6 +424,7 @@
         cursor: pointer;
         transition: 0.3s;
         font-size: 1rem;
+        flex: 1;
     }
     
     .btn-add-to-cart:hover {
@@ -181,6 +440,7 @@
         border-radius: 5px;
         cursor: not-allowed;
         margin: 1.5rem 0;
+        width: 100%;
     }
     
     .product-detail-actions {
@@ -188,7 +448,9 @@
     }
     
     .btn-back {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         padding: 10px 20px;
         background: #2a2a2a;
         color: #d4d4d4;
@@ -201,6 +463,183 @@
     .btn-back:hover {
         background: #4a5f2e;
         color: white;
+    }
+    
+    .reviews-section {
+        margin-top: 3rem;
+        background: #222;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 1px solid #3a3a3a;
+    }
+    
+    .reviews-section h3 {
+        color: #8B9A46;
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+    }
+    
+    .review-form-container {
+        background: #1a1a1a;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .review-form-container h4 {
+        color: #e0e0e0;
+        margin-bottom: 1rem;
+    }
+    
+    .login-to-review {
+        background: #1a1a1a;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .login-to-review i {
+        font-size: 2rem;
+        color: #8B9A46;
+        margin-bottom: 0.5rem;
+    }
+    
+    .login-to-review a {
+        color: #8B9A46;
+        text-decoration: none;
+    }
+    
+    .rating-selector {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .rating-selector span {
+        color: #d4d4d4;
+    }
+    
+    .stars {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 5px;
+    }
+    
+    .stars input {
+        display: none;
+    }
+    
+    .stars label {
+        font-size: 1.5rem;
+        color: #555;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    
+    .stars label:hover,
+    .stars label:hover~label,
+    .stars input:checked~label {
+        color: #ffc107;
+    }
+    
+    .review-form textarea {
+        width: 100%;
+        padding: 12px;
+        background: #2a2a2a;
+        border: 1px solid #3a3a3a;
+        border-radius: 8px;
+        color: #d4d4d4;
+        font-size: 0.9rem;
+        resize: vertical;
+        margin-bottom: 1rem;
+    }
+    
+    .btn-submit-review {
+        padding: 10px 20px;
+        background: #4a5f2e;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-submit-review:hover {
+        background: #3a4f1e;
+        transform: translateY(-2px);
+    }
+    
+    .reviews-list {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .review-card {
+        background: #1a1a1a;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid #2a2a2a;
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid #2a2a2a;
+    }
+    
+    .reviewer-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .reviewer-info i {
+        font-size: 1.2rem;
+        color: #8B9A46;
+    }
+    
+    .reviewer-info strong {
+        color: #e0e0e0;
+    }
+    
+    .review-date {
+        font-size: 0.75rem;
+        color: #888;
+    }
+    
+    .review-rating i {
+        color: #ffc107;
+        font-size: 0.9rem;
+    }
+    
+    .review-content p {
+        color: #d4d4d4;
+        line-height: 1.5;
+    }
+    
+    .no-reviews {
+        text-align: center;
+        padding: 2rem;
+        color: #888;
+    }
+    
+    .no-reviews i {
+        font-size: 48px;
+        margin-bottom: 1rem;
+        color: #4a5f2e;
     }
     
     .similar-products {
@@ -216,21 +655,47 @@
     .similar-products-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
+        gap: 1.5rem;
     }
     
     .similar-product-card {
         background: #222;
         border: 1px solid #2a2a2a;
         border-radius: 10px;
-        padding: 1rem;
-        text-align: center;
+        overflow: hidden;
         transition: 0.3s;
+        text-align: center;
     }
     
     .similar-product-card:hover {
         transform: translateY(-3px);
         border-color: #4a5f2e;
+    }
+    
+    .similar-product-image {
+        width: 100%;
+        height: 150px;
+        background: #1a1a1a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #3a3a3a;
+    }
+    
+    .similar-product-image i {
+        font-size: 48px;
+        color: #6B7A30;
+        opacity: 0.5;
+    }
+    
+    .similar-product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .similar-product-info {
+        padding: 1rem;
     }
     
     .similar-product-info h4 {
@@ -260,6 +725,42 @@
     .btn-similar:hover {
         background: #4a5f2e;
         color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .product-detail-grid {
+            flex-direction: column;
+        }
+        .product-image-placeholder {
+            height: 250px;
+        }
+        .product-detail-title {
+            font-size: 1.5rem;
+        }
+        .product-detail-price {
+            font-size: 1.5rem;
+        }
+        .features-list {
+            grid-template-columns: 1fr;
+        }
+        .similar-products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        .add-to-cart-form {
+            flex-direction: column;
+        }
+        .quantity-selector {
+            width: 100%;
+            justify-content: center;
+        }
+        .btn-add-to-cart {
+            width: 100%;
+        }
+        .review-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
     }
 </style>
 {% endblock %}

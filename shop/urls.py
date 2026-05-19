@@ -17,4 +17,5 @@ urlpatterns = [
     path('login/', views_auth.user_login, name='login'),
     path('logout/', views_auth.user_logout, name='logout'),
     path('profile/', views_auth.profile, name='profile'),
+    path('review/add/<int:product_id>/', views_shop.add_review, name='add_review'),
 ]
