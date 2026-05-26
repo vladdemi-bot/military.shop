@@ -356,11 +356,29 @@ body {
     border-color: #4a5f2e;
 }
 
-.product-image {
+
+/* СТИЛІ ДЛЯ ФОТО ТОВАРІВ */
+
+.product-img {
     width: 100%;
-    height: 250px;
     object-fit: cover;
     background: #111;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.product-icon {
+    width: 100%;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.product-icon i {
+    font-size: 64px;
+    color: #6B7A30;
+    opacity: 0.5;
 }
 
 .product-info {
@@ -374,8 +392,14 @@ body {
     color: #e0e0e0;
 }
 
+.product-category {
+    font-size: 0.85rem;
+    color: #6B7A30;
+    margin-bottom: 0.5rem;
+}
+
 .product-price {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: #8B9A46;
     margin: 0.5rem 0;
@@ -383,7 +407,7 @@ body {
 
 .btn {
     display: inline-block;
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1rem;
     background: #2a2a2a;
     color: #d4d4d4;
     text-decoration: none;
@@ -391,6 +415,7 @@ body {
     transition: 0.3s;
     text-align: center;
     border: 1px solid #4a5f2e;
+    font-size: 0.85rem;
 }
 
 .btn:hover {
@@ -423,12 +448,32 @@ body {
     padding: 1rem;
     text-align: left;
     border-bottom: 1px solid #3a3a3a;
+    color: #d4d4d4;
 }
 
 .cart-table th {
     background: #1a1a1a;
     color: #8B9A46;
     font-weight: 600;
+}
+
+.cart-table input {
+    background: #1a1a1a;
+    border: 1px solid #4a5f2e;
+    border-radius: 5px;
+    color: #d4d4d4;
+    padding: 5px;
+    text-align: center;
+    width: 60px;
+}
+
+.btn-remove {
+    color: #f44336;
+    text-decoration: none;
+}
+
+.btn-remove:hover {
+    text-decoration: underline;
 }
 
 
@@ -739,6 +784,13 @@ body {
         grid-template-columns: 1fr;
         gap: 1rem;
         padding: 1rem 0;
+    }
+    .product-img,
+    .product-icon {
+        height: 150px;
+    }
+    .product-icon i {
+        font-size: 48px;
     }
     .product-info {
         padding: 1rem;

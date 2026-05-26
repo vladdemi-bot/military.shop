@@ -4,7 +4,7 @@
     <div class="filters-section">
         <h3><i class="fas fa-filter"></i> Фільтри</h3>
 
-        <form method="get" class="filters-form" id="filter-form">
+        <form method="get" class="filters-form">
             <div class="filter-group">
                 <label><i class="fas fa-search"></i> Пошук</label>
                 <input type="text" name="search" value="{{ search_query|default:'' }}" placeholder="Назва товару...">
@@ -25,9 +25,9 @@
             <div class="filter-group">
                 <label><i class="fas fa-hryvnia-sign"></i> Ціна (грн)</label>
                 <div class="price-range">
-                    <input type="number" name="price_min" id="price_min" value="{{ price_min|default:'' }}" placeholder="від" min="0" step="100" oninput="validatePrice(this)">
+                    <input type="number" name="price_min" value="{{ price_min|default:'' }}" placeholder="від" min="0" step="100">
                     <span>-</span>
-                    <input type="number" name="price_max" id="price_max" value="{{ price_max|default:'' }}" placeholder="до" min="0" step="100" oninput="validatePrice(this)">
+                    <input type="number" name="price_max" value="{{ price_max|default:'' }}" placeholder="до" min="0" step="100">
                 </div>
             </div>
 
@@ -35,18 +35,12 @@
                 <label><i class="fas fa-ruler"></i> Розмір</label>
                 <select name="size">
                     <option value="">Будь-який</option>
-                    <option value="XS" {% if selected_size == 'XS' %}selected{% endif %}>XS</option>
-                    <option value="S" {% if selected_size == 'S' %}selected{% endif %}>S</option>
-                    <option value="M" {% if selected_size == 'M' %}selected{% endif %}>M</option>
-                    <option value="L" {% if selected_size == 'L' %}selected{% endif %}>L</option>
-                    <option value="XL" {% if selected_size == 'XL' %}selected{% endif %}>XL</option>
-                    <option value="XXL" {% if selected_size == 'XXL' %}selected{% endif %}>XXL</option>
-                    <option value="39" {% if selected_size == '39' %}selected{% endif %}>39</option>
-                    <option value="40" {% if selected_size == '40' %}selected{% endif %}>40</option>
-                    <option value="41" {% if selected_size == '41' %}selected{% endif %}>41</option>
-                    <option value="42" {% if selected_size == '42' %}selected{% endif %}>42</option>
-                    <option value="43" {% if selected_size == '43' %}selected{% endif %}>43</option>
-                    <option value="44" {% if selected_size == '44' %}selected{% endif %}>44</option>
+                    <option value="XS">XS</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                    <option value="XXL">XXL</option>
                 </select>
             </div>
 
@@ -54,10 +48,10 @@
                 <label><i class="fas fa-sort"></i> Сортувати</label>
                 <select name="sort">
                     <option value="">За замовчуванням</option>
-                    <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Ціна (спочатку дешевші)</option>
-                    <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Ціна (спочатку дорожчі)</option>
-                    <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>Назва (А-Я)</option>
-                    <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>Назва (Я-А)</option>
+                    <option value="price_asc">Ціна (спочатку дешевші)</option>
+                    <option value="price_desc">Ціна (спочатку дорожчі)</option>
+                    <option value="name_asc">Назва (А-Я)</option>
+                    <option value="name_desc">Назва (Я-А)</option>
                 </select>
             </div>
 
@@ -76,9 +70,14 @@
     <div class="products-grid">
         {% for product in products %}
         <div class="product-card">
-            <!-- ПРОСТА ІКОНКА ЗАМІСТЬ ФОТО -->
-            <div class="product-icon">
-                <i class="fas fa-tshirt"></i>
+            <!-- ФОТО НА ВСЮ ШИРИНУ КАРТКИ -->
+            <div class="product-image-wrapper">
+                {% if product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-img"> {% else %}
+                <div class="product-icon">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                {% endif %}
             </div>
             <div class="product-info">
                 <h3 class="product-title">{{ product.name }}</h3>
@@ -102,110 +101,11 @@
         max-width: 100%;
     }
     
-    .filters-section {
-        background: #222;
-        border: 1px solid #3a3a3a;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .filters-section h3 {
-        color: #8B9A46;
-        margin-bottom: 1.5rem;
-        font-size: 1.2rem;
-    }
-    
-    .filters-form {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-        align-items: flex-end;
-    }
-    
-    .filter-group {
-        flex: 1;
-        min-width: 150px;
-    }
-    
-    .filter-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: #d4d4d4;
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-    
-    .filter-group label i {
-        margin-right: 5px;
-        color: #8B9A46;
-    }
-    
-    .filter-group input,
-    .filter-group select {
-        width: 100%;
-        padding: 8px 12px;
-        background: #1a1a1a;
-        border: 1px solid #3a3a3a;
-        border-radius: 6px;
-        color: #d4d4d4;
-        font-size: 0.9rem;
-    }
-    
-    .price-range {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-    
-    .price-range input {
-        width: 100%;
-    }
-    
-    .price-range span {
-        color: #d4d4d4;
-    }
-    
-    .filter-actions {
-        display: flex;
-        gap: 10px;
-    }
-    
-    .btn-filter,
-    .btn-reset {
-        padding: 8px 20px;
-        border-radius: 6px;
-        text-decoration: none;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: 0.3s;
-        border: none;
-    }
-    
-    .btn-filter {
-        background: #4a5f2e;
-        color: white;
-    }
-    
-    .btn-filter:hover {
-        background: #3a4f1e;
-    }
-    
-    .btn-reset {
-        background: #2a2a2a;
-        color: #d4d4d4;
-        border: 1px solid #3a3a3a;
-    }
-    
-    .btn-reset:hover {
-        background: #3a3a3a;
-    }
-    
     .products-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: 2rem 0 1rem;
+        margin-bottom: 1.5rem;
         flex-wrap: wrap;
         gap: 1rem;
     }
@@ -232,7 +132,10 @@
         border-radius: 10px;
         overflow: hidden;
         transition: all 0.3s;
-        text-align: center;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 380px;
     }
     
     .product-card:hover {
@@ -240,43 +143,64 @@
         border-color: #4a5f2e;
         box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
     }
-    /* ІКОНКА ЗАМІСТЬ ФОТО */
+    /* ФОТО НА ВСЮ ШИРИНУ - БЕЗ ОБРІЗАННЯ */
     
-    .product-icon {
+    .product-image-wrapper {
         width: 100%;
-        height: 180px;
-        background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+        height: 220px;
+        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-bottom: 1px solid #3a3a3a;
+        background: #1a1a1a;
+    }
+    
+    .product-img {
+        width: 100%;
+        height: auto;
+        max-height: 220px;
+        object-fit: contain;
+        display: block;
+    }
+    
+    .product-icon {
+        width: 100%;
+        height: 220px;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .product-icon i {
         font-size: 64px;
-        color: #4a5f2e;
-        opacity: 0.6;
+        color: #6B7A30;
+        opacity: 0.5;
     }
     
     .product-info {
-        padding: 1.2rem;
+        padding: 1rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
     }
     
     .product-title {
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 600;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.3rem;
         color: #e0e0e0;
+        min-height: 45px;
     }
     
     .product-category {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         color: #6B7A30;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.3rem;
     }
     
     .product-price {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         font-weight: 700;
         color: #8B9A46;
         margin: 0.5rem 0;
@@ -292,7 +216,8 @@
         transition: 0.3s;
         text-align: center;
         border: 1px solid #4a5f2e;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        margin-top: auto;
     }
     
     .btn:hover {
@@ -304,6 +229,7 @@
         text-align: center;
         padding: 3rem;
         color: #888;
+        grid-column: 1 / -1;
     }
     
     .no-products i {
@@ -313,26 +239,17 @@
     }
     
     @media (max-width: 768px) {
-        .filters-form {
-            flex-direction: column;
-        }
-        .filter-group {
-            width: 100%;
-        }
-        .filter-actions {
-            width: 100%;
-        }
-        .btn-filter,
-        .btn-reset {
-            flex: 1;
-            text-align: center;
-        }
         .products-header {
             flex-direction: column;
             text-align: center;
         }
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+        .product-image-wrapper,
+        .product-img,
         .product-icon {
-            height: 120px;
+            height: 200px;
         }
         .product-icon i {
             font-size: 48px;

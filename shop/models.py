@@ -28,7 +28,7 @@ class Product(models.Model):
     available = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    
+    image_url = models.URLField(max_length=500, blank=True, null=True, verbose_name='364870430.webp')
     class Meta:
         ordering = ['-created']
     

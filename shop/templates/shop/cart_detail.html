@@ -20,11 +20,15 @@
                     <td>{{ item.product.name }}</td>
                     <td>{{ item.price }} грн</td>
                     <td>
-                        <form action="{% url 'shop:cart_add' item.product.id %}" method="post" style="display: inline;">
+                        <form action="{% url 'shop:cart_add' item.product.id %}" method="post" class="update-form">
                             {% csrf_token %}
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width: 60px;">
+                            <input type="hidden" name="next" value="{% url 'shop:cart_detail' %}">
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="quantity-input" data-product-id="{{ item.product.id }}" data-stock="{{ item.product.stock }}">
                             <button type="submit" class="btn-update">Оновити</button>
                         </form>
+                        {% if item.quantity > item.product.stock %}
+                        <div class="stock-warning">⚠️ Доступно лише {{ item.product.stock }} шт.</div>
+                        {% endif %}
                     </td>
                     <td>{{ item.total_price }} грн</td>
                     <td>
@@ -54,6 +58,25 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+    document.querySelectorAll('.quantity-input').forEach(function(input) {
+        input.addEventListener('change', function() {
+            let maxStock = parseInt(this.getAttribute('max'));
+            let currentValue = parseInt(this.value);
+
+            if (currentValue > maxStock) {
+                this.value = maxStock;
+                alert('Доступно лише ' + maxStock + ' шт. цього товару');
+            }
+            if (currentValue < 1 || isNaN(currentValue)) {
+                this.value = 1;
+            }
+            // Автоматично відправляємо форму
+            this.form.submit();
+        });
+    });
+</script>
 
 <style>
     .cart-container {
@@ -91,12 +114,14 @@
         font-weight: 600;
     }
     
-    .cart-table input {
+    .quantity-input {
+        width: 70px;
+        padding: 5px;
         background: #1a1a1a;
         border: 1px solid #4a5f2e;
         border-radius: 5px;
         color: #d4d4d4;
-        padding: 5px;
+        text-align: center;
     }
     
     .btn-update {
@@ -120,6 +145,12 @@
     
     .btn-remove:hover {
         text-decoration: underline;
+    }
+    
+    .stock-warning {
+        color: #ff9800;
+        font-size: 0.7rem;
+        margin-top: 5px;
     }
     
     .cart-actions {
@@ -179,6 +210,9 @@
         }
         .cart-actions {
             flex-direction: column;
+        }
+        .quantity-input {
+            width: 50px;
         }
     }
 </style>

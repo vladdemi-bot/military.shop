@@ -103,11 +103,28 @@ def cart_add(request, product_id):
     
     # Отримуємо кількість з POST запиту
     quantity = int(request.POST.get('quantity', 1))
-    cart.add(product=product, quantity=quantity)
+    
+    # Перевірка, щоб кількість не перевищувала залишок на складі
+    if quantity > product.stock:
+        quantity = product.stock
+        messages.warning(request, f'Доступно лише {product.stock} шт. товару "{product.name}"')
+    
+    if quantity <= 0:
+        quantity = 1
+    
+    # ОНОВЛЮЄМО кількість, а не додаємо
+    cart.update(product=product, quantity=quantity)
     
     # Повертаємося на ту ж сторінку
     next_url = request.POST.get('next', 'shop:cart_detail')
     return redirect(next_url)
+
+
+def cart_remove(request, product_id):
+    cart = Cart(request)
+    product = get_object_or_404(Product, id=product_id)
+    cart.remove(product)
+    return redirect('shop:cart_detail')
 
 
 def cart_remove(request, product_id):
